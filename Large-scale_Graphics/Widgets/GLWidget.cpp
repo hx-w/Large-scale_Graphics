@@ -105,12 +105,6 @@ void GLWidget::initializeGL() {
 	_objLoader->load(this->fileName, vertPoints);
 	qDebug() << vertPoints.count();
 
-	//float _Points[] = {
-	//	3.0f,4.0f,0.0f,
-	//	1.0f,-1.0f,0.0f,
-	//	0.0f,1.0f,0.0f,
-	//};
-
 	//get id
 	GLCall(glGenVertexArrays(1, &VAO));
 	GLCall(glGenBuffers(1, &VBO));
@@ -120,8 +114,6 @@ void GLWidget::initializeGL() {
 	//2.then bind and set vertex buffers
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 	GLCall(glBufferData(GL_ARRAY_BUFFER, vertPoints.size() * sizeof(GL_FLOAT), &vertPoints[0], GL_STATIC_DRAW));//顶点数据复制到缓冲
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(_Points), _Points, GL_STATIC_DRAW);
 
 	//3.and then configure vertex attributes
 	GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0));

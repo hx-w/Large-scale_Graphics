@@ -3,16 +3,13 @@
 #include <QFile>
 #include <QDebug>
 OBJLoader::OBJLoader(QObject *parent)
-	: QObject(parent)
-{
+	: QObject(parent) {
 }
 
-OBJLoader::~OBJLoader()
-{
+OBJLoader::~OBJLoader() {
 }
 
-bool OBJLoader::load(const QString fileName, QVector<float> &vPoints)
-{
+bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 	if (fileName.mid(fileName.lastIndexOf('.')) != ".obj" && fileName.mid(fileName.lastIndexOf('.')) != ".OBJ") {
 		qDebug() << "file is not a obj file!";
 		return false;
@@ -32,7 +29,7 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints)
 		QByteArray lineData = objfile.readLine();
 
 		lineData = lineData.remove(lineData.count() - 2, 2);
-		qDebug() << lineData;
+		// qDebug() << lineData;
 
 		if (lineData == "")
 			continue;
