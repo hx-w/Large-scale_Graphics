@@ -139,14 +139,15 @@ void GLWidget::paintGL() {
 	GLCall(glEnable(GL_DEPTH_TEST));
 	GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	
 
 	GLCall(program->bind());
 	GLCall(glBindVertexArray(VAO));
 	mMatrix.setToIdentity();
+	mMatrix.translate(x_trans, y_trans, 0);
 	mMatrix.rotate(180.0f - (angleX / 16.0f), 1, 0, 0);
 	mMatrix.rotate(angleY / 16.0f, 0, 1, 0);
 	mMatrix.rotate(anglZ / 16.0f, 0, 0, 1);
+	mMatrix.scale(scale_factor);
 	GLCall(program->setUniformValue("uPMatrix", pMatrix));
 	GLCall(program->setUniformValue("uVMatrix", vMatrix));
 	GLCall(program->setUniformValue("uMMatrix", mMatrix));
@@ -170,8 +171,30 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
 		setYRotation(angleY + 8 * dx);
 	}
 	else if (event->buttons() & Qt::RightButton) {
-		setXRotation(angleX + 8 * dx);
-		setZRotation(angleY + 8 * dy);
+		x_trans += dx;
+		y_trans += dy;
+		update();
+		//setXRotation(angleX + 8 * dx);
+		//setZRotation(angleY + 8 * dy);
 	}
 	mouseLastPos = event->pos();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event) {
+	QPoint numPixels, numDegrees;
+	numPixels = event->pixelDelta();
+	numDegrees = event->angleDelta() / 8;
+
+	int step = 0;
+	if (!numPixels.isNull()) {
+		step = numPixels.y();
+	}
+	else if (!numDegrees.isNull()) {
+		QPoint numSteps = numDegrees / 15;
+		step = numSteps.y();
+	}
+	scale_factor += step * scale_transform_tick;
+	if (scale_factor < 0) scale_factor = 0;
+	update();
+	qDebug() << "scale: " << scale_factor;
 }
