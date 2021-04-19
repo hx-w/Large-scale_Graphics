@@ -9,6 +9,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions_3_3_Core>
 #include "../Loaders/OBJLoader.h"
+#include "../bspline.h"
 
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
@@ -17,10 +18,10 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
 	GLWidget(const QString fileName,QWidget *parent = Q_NULLPTR);
 	~GLWidget();
-	 void GLClearError();
-	 bool GLCheckError(const char* function, const char* file, int line);
-	 QSize minimumSizeHint() const override;
-	 QSize sizeHint() const override;
+	void GLClearError();
+	bool GLCheckError(const char* function, const char* file, int line);
+	QSize minimumSizeHint() const override;
+	QSize sizeHint() const override;
 
 public slots:
 	void setXRotation(int angle);
@@ -49,6 +50,8 @@ private:
 	QVector<float> vertPoints;
 	QOpenGLShaderProgram *program;
 	QString fileName;
+
+	BsplineMethod mybsp;
 
 	QPoint mouseLastPos;
 	qreal scale_factor = 1;

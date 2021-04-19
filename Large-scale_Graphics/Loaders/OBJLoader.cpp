@@ -79,7 +79,7 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 	for (auto &verFaceInfo : facesIndexs) {
 		int vIndex = std::get<0>(verFaceInfo);
 
-		int vPointSizes = vertextPoints.count() / 3;
+		// int vPointSizes = vertextPoints.count() / 3;
 		//将顶点坐标放入
 		vPoints << vertextPoints.at(vIndex * 3 - 3);
 		vPoints << vertextPoints.at(vIndex * 3 - 2);

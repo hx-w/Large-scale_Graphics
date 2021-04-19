@@ -103,7 +103,16 @@ void GLWidget::initializeGL() {
 
 	OBJLoader  *_objLoader = new OBJLoader();
 	_objLoader->load(this->fileName, vertPoints);
-	qDebug() << vertPoints.count();
+
+	mybsp.init(3, 5, vertPoints);
+	mybsp.split();
+	
+	mybsp.pre_calcbspline();
+	mybsp.downSampling();
+	
+//	vertPoints = mybsp.join();
+
+	qDebug() <<"total vertex number: " << vertPoints.count();
 
 	//get id
 	GLCall(glGenVertexArrays(1, &VAO));
@@ -143,10 +152,11 @@ void GLWidget::paintGL() {
 	GLCall(program->bind());
 	GLCall(glBindVertexArray(VAO));
 	mMatrix.setToIdentity();
-	mMatrix.translate(x_trans, y_trans, 0);
-	mMatrix.rotate(180.0f - (angleX / 16.0f), 1, 0, 0);
+	mMatrix.translate(0.1 * x_trans, 0.1 * y_trans, 0);
+	mMatrix.rotate(180.0f - (angleX / 16.0f), 1, 0, 0); 
 	mMatrix.rotate(angleY / 16.0f, 0, 1, 0);
 	mMatrix.rotate(anglZ / 16.0f, 0, 0, 1);
+	//scale_factor = 0.2;
 	mMatrix.scale(scale_factor);
 	GLCall(program->setUniformValue("uPMatrix", pMatrix));
 	GLCall(program->setUniformValue("uVMatrix", vMatrix));

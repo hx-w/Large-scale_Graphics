@@ -10,7 +10,11 @@ MainWindow::MainWindow(QWidget *parent)
 	createStatusBar();
 
 	setCurrentFile(QString());
+	
+	glWidget = new GLWidget("Res/custom/model.obj");
+	setCentralWidget(glWidget);
 
+	setCurrentFile(QString());
     
 }
 void MainWindow::importObj() {
