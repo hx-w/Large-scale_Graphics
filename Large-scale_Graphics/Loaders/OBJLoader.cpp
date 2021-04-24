@@ -46,7 +46,6 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 
 		else if (dataType == "f") {
 			if (strValues.size() == 4) {
-				continue;
 				strValues.push_back(strValues.at(0));
 				strValues.push_back(strValues.at(2));
 			}
@@ -87,46 +86,31 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 		vPoints << vertextPoints.at(vIndex * 3 - 1);
 	}
 	*/
-	QMap<int, QSet<int>> stat;
+
+	Hierholzer algo;
+
 	QVector<int> temp_index;
 	for (auto &verFaceInfo : facesIndexs) {
 		int vIndex = std::get<0>(verFaceInfo);
 		temp_index.append(vIndex);
 		if (temp_index.count() == 3) {
-			stat[temp_index[0]].insert(temp_index[1]);
-			stat[temp_index[0]].insert(temp_index[2]);
-			stat[temp_index[1]].insert(temp_index[0]);
-			stat[temp_index[1]].insert(temp_index[2]);
-			stat[temp_index[2]].insert(temp_index[1]);
-			stat[temp_index[2]].insert(temp_index[0]);
-
-
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 1);
-
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 1);
-
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[1] * 3 - 1);
-
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 1);
-
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[0] * 3 - 1);
-
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 3);
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 2);
-			vPoints << vertextPoints.at(temp_index[2] * 3 - 1);
+			algo.connet_points(temp_index[0], temp_index[1]);
+			algo.connet_points(temp_index[2], temp_index[1]);
+			algo.connet_points(temp_index[0], temp_index[2]);
 			temp_index.clear();
 		}
 	}
+
+	algo.run(); // ËãÅ·À­¼£
+
+	QVector<int> trace = algo.get_answer();
+
+	for (auto index : trace) {
+		vPoints.append(vertextPoints.at(index * 3 - 3));
+		vPoints.append(vertextPoints.at(index * 3 - 2));
+		vPoints.append(vertextPoints.at(index * 3 - 1));
+	}
+
 
 	vertextPoints.clear();
 	facesIndexs.clear();

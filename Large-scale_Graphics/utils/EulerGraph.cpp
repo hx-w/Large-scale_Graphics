@@ -21,5 +21,9 @@ void Hierholzer::run() {
 }
 
 void Hierholzer::dfs_plus(int currV) {
-
+	while (!p2ps[currV].empty()) {
+		int nextV = p2ps[currV].takeFirst();
+		dfs_plus(nextV);
+	}
+	euler_trace.append(currV);
 }

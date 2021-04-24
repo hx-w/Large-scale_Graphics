@@ -104,13 +104,13 @@ void GLWidget::initializeGL() {
 	OBJLoader  *_objLoader = new OBJLoader();
 	_objLoader->load(this->fileName, vertPoints);
 
-	mybsp.init(3, 3, vertPoints);
+	mybsp.init(2, 1, vertPoints);
 	mybsp.split();
 	
 	mybsp.pre_calcbspline();
 	mybsp.downSampling();
 	
-	//vertPoints = mybsp.join();
+//	vertPoints = mybsp.join();
 
 	qDebug() <<"total vertex number: " << vertPoints.count();
 	
@@ -164,7 +164,7 @@ void GLWidget::paintGL() {
 	GLCall(program->setUniformValue("uMMatrix", mMatrix));
 	int vertexcount = vertPoints.size() / 3;
 	
-	GLCall(glDrawArrays(GL_LINES, 0, vertexcount));
+	GLCall(glDrawArrays(GL_LINE_STRIP, 0, vertexcount));
 	//glDrawArrays(GL_LINE_STRIP, 0, vertexcount);
 
 }

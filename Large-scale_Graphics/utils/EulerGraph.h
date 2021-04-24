@@ -5,6 +5,7 @@
 
 class Hierholzer {
 // 所有的顶点数据都是索引，原始数据不保存在这里
+// 能确保图能构造欧拉回路，即所有点的度都是偶数
 public:
 	Hierholzer();
 	~Hierholzer();
