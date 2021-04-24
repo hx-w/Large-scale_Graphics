@@ -9,7 +9,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions_3_3_Core>
 #include "../Loaders/OBJLoader.h"
-#include "../bspline.h"
+#include "../utils/bspline.h"
 
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
