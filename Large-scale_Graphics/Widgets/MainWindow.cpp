@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	setCurrentFile(QString());
 	
-	glWidget = new GLWidget("Res/custom/new_model.obj");
+	glWidget = new GLWidget("Res/custom/plane.obj");
 	setCentralWidget(glWidget);
 
 	setCurrentFile(QString());
