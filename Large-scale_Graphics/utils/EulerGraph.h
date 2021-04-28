@@ -2,6 +2,7 @@
 
 #include <QVector>
 #include <QMap>
+#include <QDebug>
 
 class Hierholzer {
 // 所有的顶点数据都是索引，原始数据不保存在这里

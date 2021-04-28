@@ -86,7 +86,7 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 		vPoints << vertextPoints.at(vIndex * 3 - 1);
 	}
 	*/
-
+	
 	Hierholzer algo;
 
 	QVector<int> temp_index;
@@ -110,7 +110,6 @@ bool OBJLoader::load(const QString fileName, QVector<float> &vPoints) {
 		vPoints.append(vertextPoints.at(index * 3 - 2));
 		vPoints.append(vertextPoints.at(index * 3 - 1));
 	}
-
 
 	vertextPoints.clear();
 	facesIndexs.clear();
@@ -150,7 +149,6 @@ bool OBJLoader::load_new(const QString fileName, QVector<float> &vPoints) {
 				if (strValues[i] != "")
 					vertextPoints.push_back(strValues[i].toFloat());
 			}
-
 		}
 
 		else if (dataType == "f") {

@@ -2,6 +2,9 @@
 
 #include <QVector>
 #include <iostream>
+#include <fstream>
+
+typedef QVector<float> vlist;
 
 class BsplineMethod {
 public:
@@ -9,29 +12,32 @@ public:
 	~BsplineMethod() { };
 
 
-	void init(int n, int m, QVector<float> origin);
-	void split();
+	void init(int n, int m);
 
-	QVector<float> join();
+	QVector<vlist> split(const vlist origin);
 
-	void pre_calcbspline();
+	vlist join(const QVector<vlist> xyz);
 
-	float calc_bsplineKernel(int k); // b样条卷积核
+	vlist low_pass_filter(const vlist origin); // 低通滤波，序列个数不变
+
+	vlist down_sampling(const vlist origin); // 下采样
+
+	float Beta_m_n(int k); // b样条卷积核
 	
-	float factorial(int x); // 阶乘
+	float S_1_n(int k); // b样条反卷积核
+	
+	vlist up_sampling_bsp(const vlist origin);
 
-	float binomialC(int down, int up); // 二项式系数
+	void dump(const std::string filename, const vlist origin);
 
-	void downSampling();
-
-	void downSampling(int idx);
+	vlist load(const std::string filname);
 
 private:
 	int n; // n阶
 	int m; // m倍
-	QVector<float> origin;
-	QVector<float> splits[3];
-	QVector<float> res[3];
-	QVector<float> bspline;
+	
+	// 内部方法
+	float factorial(int x); // 阶乘
+	float binomialC(int down, int up); // 二项式系数
 };
 

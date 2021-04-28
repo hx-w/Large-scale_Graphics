@@ -26,7 +26,7 @@ void GLWidget::setXRotation(int angle) {
 	qNormalizeAngle(angle);
 	if (angle != angleX) {
 		angleX = angle;
-		emit xRotationChanged(angle);
+		// emit xRotationChanged(angle);
 		update();
 	}
 }
@@ -34,7 +34,7 @@ void GLWidget::setYRotation(int angle) {
 	qNormalizeAngle(angle);
 	if (angle != angleY) {
 		angleY = angle;
-		emit yRotationChanged(angle);
+		//emit yRotationChanged(angle);
 		update();
 	}
 }
@@ -104,16 +104,33 @@ void GLWidget::initializeGL() {
 	OBJLoader  *_objLoader = new OBJLoader();
 	_objLoader->load(this->fileName, vertPoints);
 
-	mybsp.init(2, 1, vertPoints);
-	mybsp.split();
-	
-	mybsp.pre_calcbspline();
-	mybsp.downSampling();
-	
-//	vertPoints = mybsp.join();
 
-	qDebug() <<"total vertex number: " << vertPoints.count();
+	//--------------------- bsp works ---------------------
+	BsplineMethod mybsp;
+
+	mybsp.init(3, 3); // n, m
 	
+	// QVector<QVector<float>>     x y z∑÷¡ø
+	/*
+	auto xyz = mybsp.split(vertPoints); 
+	
+	for (int idx = 0; idx < 3; idx++) {
+		xyz[idx] = mybsp.low_pass_filter(xyz[idx]);
+		// xyz[idx] = mybsp.down_sampling(xyz[idx]);
+	}
+
+	vertPoints = mybsp.join(xyz);
+	*/
+	// mybsp.dump("little_plane_2.txt", vertPoints);
+	
+	vertPoints = mybsp.load("Res/models/3_little_plane_2.txt");
+	auto xyz = mybsp.split(vertPoints);
+	for (int idx = 0; idx < 3; idx++) {
+		xyz[idx] = mybsp.down_sampling(xyz[idx]);
+	}
+	vertPoints = mybsp.join(xyz);
+	qDebug() <<"total vertex number: " << vertPoints.count();
+	//-------------------------------------------------------
 
 	//get id
 	GLCall(glGenVertexArrays(1, &VAO));
@@ -154,9 +171,9 @@ void GLWidget::paintGL() {
 	GLCall(glBindVertexArray(VAO));
 	mMatrix.setToIdentity();
 	mMatrix.translate(0.1 * x_trans, 0.1 * y_trans, 0);
-	mMatrix.rotate(180.0f - (angleX / 16.0f), 1, 0, 0); 
+	mMatrix.rotate(angleX / 16.0f, 1, 0, 0); 
 	mMatrix.rotate(angleY / 16.0f, 0, 1, 0);
-	mMatrix.rotate(anglZ / 16.0f, 0, 0, 1);
+	mMatrix.rotate(0, 0, 0, 1);
 	//scale_factor = 0.2;
 	mMatrix.scale(scale_factor);
 	GLCall(program->setUniformValue("uPMatrix", pMatrix));
@@ -164,7 +181,7 @@ void GLWidget::paintGL() {
 	GLCall(program->setUniformValue("uMMatrix", mMatrix));
 	int vertexcount = vertPoints.size() / 3;
 	
-	GLCall(glDrawArrays(GL_LINE_STRIP, 0, vertexcount));
+	GLCall(glDrawArrays(GL_LINE_LOOP, 0, vertexcount));
 	//glDrawArrays(GL_LINE_STRIP, 0, vertexcount);
 
 }

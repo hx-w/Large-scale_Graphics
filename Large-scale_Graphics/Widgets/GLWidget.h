@@ -51,10 +51,8 @@ private:
 	QOpenGLShaderProgram *program;
 	QString fileName;
 
-	BsplineMethod mybsp;
-
 	QPoint mouseLastPos;
 	qreal scale_factor = 1;
-	qreal scale_transform_tick = 0.05;
+	qreal scale_transform_tick = 0.01;
 	qreal x_trans = 0, y_trans = 0;
 };
