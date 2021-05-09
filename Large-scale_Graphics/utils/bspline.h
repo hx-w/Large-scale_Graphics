@@ -27,11 +27,12 @@ public:
 	float S_1_n(int k); // b样条反卷积核
 	
 	vlist up_sampling_bsp(const vlist origin);
+	
+	// vlist gauss_filter(const vlist origin);
 
 	void dump(const std::string filename, const vlist origin);
 
 	vlist load(const std::string filname);
-
 private:
 	int n; // n阶
 	int m; // m倍
@@ -39,5 +40,6 @@ private:
 	// 内部方法
 	float factorial(int x); // 阶乘
 	float binomialC(int down, int up); // 二项式系数
+	float Gauss(int x);
 };
 

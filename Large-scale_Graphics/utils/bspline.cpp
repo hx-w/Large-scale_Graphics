@@ -89,13 +89,13 @@ vlist BsplineMethod::low_pass_filter(const vlist origin) {
 		float val = 0;
 
 		for (int j = 0; j <= m - 1; j++) {
-			int p_max = (count - j) / m; // Õû³ý
+			int p_max = (count - j - 1) / m; // Õû³ý
 			float sum_p = 0;
 
-			for (int p = 0; p < p_max; p++) {
+			for (int p = 0; p <= p_max; p++) {
 				float sum_i = 0;
 			
-				for (int i = -12; i <= 12; i++) {
+				for (int i = -20; i <= 20; i++) {
 					int b_idx = k - j - m * p - m * i;
 					float beta_m_n = Beta_m_n(b_idx);
 					float s_1_n = S_1_n(i);
@@ -135,7 +135,6 @@ void BsplineMethod::dump(const std::string filename, const vlist origin) {
 		}
 	}
 	outF.close();
-	qDebug() << "dump cache finish";
 }
 
 vlist BsplineMethod::load(const std::string filename) {
@@ -149,36 +148,68 @@ vlist BsplineMethod::load(const std::string filename) {
 		}
 	}
 	inF.close();
-	qDebug() << "load cache finish";
 	return cache_list;
 }
 
 vlist BsplineMethod::up_sampling_bsp(const vlist origin) {
 	vlist us_res;
-	int origin_N = origin.count();
-	int new_N = origin_N * m;
 
-	for (int k = 0; k < new_N; k++) {
-		float sum_p = 0;
-		// p loop
-		for (int p = k - n; p <= k; p++) {
-			float beta_m_n = Beta_m_n(k - p);
-			
-			float up_sample_c = 0;
-			if (p % m == 0) {
-				int new_p = p / m;
-				// i loop
-				for (int i = new_p - 7; i <= new_p; i++) {
-					if (i > origin_N || i < 0) continue;
-					float s_1_n = S_1_n(new_p - i);
-					float val = origin[i];
-					up_sample_c += s_1_n * val;
-				}
-			}
-			sum_p += beta_m_n * up_sample_c;
+	// calc T(k)
+	vlist T;
+	int N_old = origin.count();
+	for (int k = 0; k < N_old; k++) {
+		float val = 0;
+		for (int i = std::max(-4, k - N_old + 1); i <= std::min(k, 4); i++) {
+			val += S_1_n(i) * origin[k - i];
 		}
-		us_res.append(sum_p);
+		T.append(val);
+	}
+
+	// calc res
+	int N_new = N_old * m;
+	for (int k = 0; k < N_new; k++) {
+		float val = 0;
+		for (int i = std::max(k - N_new + 1, 0); i <= std::min(k, 3 * m); i++) {
+			if ((k - i) % m == 0) {
+				int idx = (k - i) / m;
+				val += Beta_m_n(i) * T[idx];
+			}
+		}
+		us_res.append(val);
 	}
 
 	return us_res;
+}
+
+float BsplineMethod::LSD(const vlist vl1, const vlist vl2) {
+	float ans = 0;
+	int count = std::min(vl1.count(), vl2.count());
+
+	for (int idx = 0; idx < count; idx++) {
+		ans += std::pow(vl1[idx] - vl2[idx], 1);
+	}
+
+	return ans;
+}
+
+vlist BsplineMethod::gauss_filter(const vlist origin) {
+	vlist res;
+	for (int k = 0; k < origin.count(); k++) {
+		float val = 0;
+		for (int i = std::max(0, k - origin.count() + 1); i < std::min(3 * m, k); i++) {
+			val += origin[k - i] * Gauss(i);
+		}
+		res.append(val);
+	}
+	return res;
+}
+
+float BsplineMethod::Gauss(int x) {
+	float pi = 3.14159265358979323846264333827950288489786939937510;
+	float e = 2.7182818286;
+	float delta = 0.2;
+	float fir = 1.0 / (delta * sqrtf(2 * pi));
+	float thi = pow((x - 1.5), 2) / (2.0 * delta * delta);
+
+	return fir * pow(e, -thi);
 }

@@ -1,5 +1,6 @@
 #include "glWidget.h"
 
+#include <string>
 static GLuint VBO, VAO, EBO;
 
 #define ASSERT(x) if (!x) __debugbreak();
@@ -107,28 +108,47 @@ void GLWidget::initializeGL() {
 
 	//--------------------- bsp works ---------------------
 	BsplineMethod mybsp;
-
-	mybsp.init(3, 3); // n, m
-	
-	// QVector<QVector<float>>     x y z∑÷¡ø
-	/*
-	auto xyz = mybsp.split(vertPoints); 
-	
-	for (int idx = 0; idx < 3; idx++) {
-		xyz[idx] = mybsp.low_pass_filter(xyz[idx]);
-		// xyz[idx] = mybsp.down_sampling(xyz[idx]);
-	}
-
-	vertPoints = mybsp.join(xyz);
-	*/
-	// mybsp.dump("little_plane_2.txt", vertPoints);
-	
-	vertPoints = mybsp.load("Res/models/3_little_plane_2.txt");
+	mybsp.init(3, 4);
 	auto xyz = mybsp.split(vertPoints);
+	mybsp.dump("../../cpp/oorigin.txt", xyz[0]);
+	vertPoints = mybsp.load("Res/models/4_little_plane_1.txt");
+//	mybsp.dump("cache.txt", vertPoints);
+	// vertPoints = mybsp.load("cache.txt");
 	for (int idx = 0; idx < 3; idx++) {
+//		xyz[idx] = mybsp.gauss_filter(xyz[idx]);
 		xyz[idx] = mybsp.down_sampling(xyz[idx]);
+		xyz[idx] = mybsp.up_sampling_bsp(xyz[idx]);
 	}
-	vertPoints = mybsp.join(xyz);
+	//mybsp.dump("../../cpp/bsp.txt", xyz[0]);
+//	vertPoints = mybsp.join(xyz);
+	/*
+	for (int m = 2; m <= 8; m++) {
+		mybsp.init(3, m);
+		auto xyz = mybsp.split(vertPoints);
+		// origin
+		for (int idx = 0; idx < 3; idx++) {
+			xyz[idx] = mybsp.down_sampling(xyz[idx]);
+			xyz[idx] = mybsp.up_sampling_bsp(xyz[idx]);
+		}
+		auto origin = mybsp.join(xyz);
+		
+		std::string filename = std::string("Res/models/") + char('0' + m) + "_little_plane_1.txt";
+		auto vs = mybsp.load(filename);
+		auto xyz2 = mybsp.split(vs);
+		for (int idx = 0; idx < 3; idx++) {
+			xyz2[idx] = mybsp.down_sampling(xyz2[idx]);
+			xyz2[idx] = mybsp.up_sampling_bsp(xyz2[idx]);
+		}
+		auto lowp = mybsp.join(xyz2);
+		
+
+		float LSD1 = mybsp.LSD(origin, vertPoints);
+		float LSD2 = mybsp.LSD(lowp, vertPoints);
+		float LSD = mybsp.LSD(lowp, origin);
+		//qDebug() << "[m=" << m << "] " << LSD1 << "     " << LSD2;
+		qDebug() << "[m=" << m << "] " << LSD;
+	}
+	*/
 	qDebug() <<"total vertex number: " << vertPoints.count();
 	//-------------------------------------------------------
 
@@ -163,6 +183,12 @@ void GLWidget::resizeGL(int w, int h) {
 }
 
 void GLWidget::paintGL() {
+	angleX = 1584;
+	angleY = 8;
+//	scale_factor = 0.09;
+	x_trans = 5;
+	y_trans = -299;
+
 	GLCall(glEnable(GL_DEPTH_TEST));
 	GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -181,8 +207,9 @@ void GLWidget::paintGL() {
 	GLCall(program->setUniformValue("uMMatrix", mMatrix));
 	int vertexcount = vertPoints.size() / 3;
 	
-	GLCall(glDrawArrays(GL_LINE_LOOP, 0, vertexcount));
+	GLCall(glDrawArrays(GL_POINTS, 0, vertexcount));
 	//glDrawArrays(GL_LINE_STRIP, 0, vertexcount);
+	qDebug() << "angleX: " << angleX << " angleY: " << angleY << " scale: " << scale_factor << " xtrans: " << x_trans << " ytrans: " << y_trans;
 
 }
 
@@ -224,5 +251,4 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
 	scale_factor += step * scale_transform_tick;
 	if (scale_factor < 0) scale_factor = 0;
 	update();
-	qDebug() << "scale: " << scale_factor;
 }
